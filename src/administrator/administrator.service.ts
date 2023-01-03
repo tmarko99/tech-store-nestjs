@@ -1,3 +1,4 @@
+import { ApiResponse } from './../shared/api-response';
 import { Administrator } from './administrator.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -17,7 +18,7 @@ export class AdministratorService {
     return await this.administratorRepository.find();
   }
 
-  async getById(id: number): Promise<Administrator> {
+  async getById(id: number): Promise<Administrator | ApiResponse> {
     const administrator = await this.administratorRepository.findOne({
       where: {
         administratorId: id,
@@ -25,7 +26,9 @@ export class AdministratorService {
     });
 
     if (!administrator) {
-      throw new NotFoundException(
+      return new ApiResponse(
+        'error',
+        -1002,
         `Administrator with given id: ${id} is not found`,
       );
     }
@@ -35,24 +38,45 @@ export class AdministratorService {
 
   async addAdministrator(
     addAdministratorDto: AddAdministratorDto,
-  ): Promise<Administrator> {
-    const { password } = addAdministratorDto;
+  ): Promise<Administrator | ApiResponse> {
     const administrator =
       this.administratorRepository.create(addAdministratorDto);
 
-    administrator.passwordHash = await bcrypt.hash(password, 10);
+    administrator.passwordHash = await bcrypt.hash(
+      addAdministratorDto.password,
+      10,
+    );
 
-    return await this.administratorRepository.save(administrator);
+    return new Promise((resolve) => {
+      this.administratorRepository
+        .save(administrator)
+        .then((admin) => resolve(admin))
+        .catch((error) => {
+          const response = new ApiResponse(
+            'error',
+            -1001,
+            'Administrator with given username already exists',
+          );
+          resolve(response);
+        });
+    });
   }
 
   async editAdministrator(
     id: number,
     editAdministratorDto: EditAdministratorDto,
-  ): Promise<Administrator> {
+  ): Promise<Administrator | ApiResponse> {
     const administrator = await this.getById(id);
 
-    administrator.passwordHash = bcrypt.hash(editAdministratorDto.password, 10);
+    if (administrator instanceof Administrator) {
+      administrator.passwordHash = await bcrypt.hash(
+        editAdministratorDto.password,
+        10,
+      );
 
-    return await this.administratorRepository.save(administrator);
+      return await this.administratorRepository.save(administrator);
+    }
+
+    return administrator;
   }
 }

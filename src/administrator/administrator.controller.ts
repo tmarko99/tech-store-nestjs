@@ -1,3 +1,4 @@
+import { ApiResponse } from './../shared/api-response';
 import { Administrator } from './administrator.entity';
 import { AdministratorService } from './administrator.service';
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
@@ -14,14 +15,14 @@ export class AdministratorController {
   }
 
   @Get('/:id')
-  getById(@Param('id') id: number): Promise<Administrator> {
+  getById(@Param('id') id: number): Promise<Administrator | ApiResponse> {
     return this.administratorService.getById(id);
   }
 
   @Post()
   addAdministrator(
     @Body() addAdministratorDto: AddAdministratorDto,
-  ): Promise<Administrator> {
+  ): Promise<Administrator | ApiResponse> {
     return this.administratorService.addAdministrator(addAdministratorDto);
   }
 
@@ -29,7 +30,7 @@ export class AdministratorController {
   editAdministrator(
     @Param('id') id: number,
     @Body() editAdministratorDto: EditAdministratorDto,
-  ): Promise<Administrator> {
+  ): Promise<Administrator | ApiResponse> {
     return this.administratorService.editAdministrator(
       id,
       editAdministratorDto,
