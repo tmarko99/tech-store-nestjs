@@ -3,6 +3,8 @@ import {
   Entity,
   Index,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -12,6 +14,7 @@ import { ArticlePrice } from './article-price.entity';
 import { CartArticle } from '../cart/cart-article.entity';
 import { Category } from '../category/category.entity';
 import { Photo } from '../photo/photo.entity';
+import { Feature } from './../feature/feature.entity';
 
 @Index('article_pkey', ['articleId'], { unique: true })
 @Entity()
@@ -54,6 +57,17 @@ export class Article {
 
   @OneToMany(() => ArticleFeature, (articleFeature) => articleFeature.article)
   articleFeatures: ArticleFeature[];
+
+  @ManyToMany(() => Feature, (feature) => feature.articles)
+  @JoinTable({
+    name: 'article_feature',
+    joinColumn: { name: 'article_id', referencedColumnName: 'articleId' },
+    inverseJoinColumn: {
+      name: 'feature_id',
+      referencedColumnName: 'featureId',
+    },
+  })
+  features: Feature[];
 
   @OneToMany(() => ArticlePrice, (articlePrice) => articlePrice.article)
   articlePrices: ArticlePrice[];
