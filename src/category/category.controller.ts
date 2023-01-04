@@ -3,7 +3,7 @@ import { Crud } from '@nestjsx/crud';
 import { Category } from './category.entity';
 import { CategoryService } from './category.service';
 
-@Controller('category')
+@Controller('api/category')
 @Crud({
   model: {
     type: Category,

@@ -5,7 +5,7 @@ import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { AddAdministratorDto } from './dto/add-administrator.dto';
 import { EditAdministratorDto } from './dto/edit-administrator.dto';
 
-@Controller('administrator')
+@Controller('api/administrator')
 export class AdministratorController {
   constructor(private readonly administratorService: AdministratorService) {}
 

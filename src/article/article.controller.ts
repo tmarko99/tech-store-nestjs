@@ -5,7 +5,7 @@ import { Controller, Body, Post } from '@nestjs/common';
 import { Crud } from '@nestjsx/crud';
 import { ArticleService } from './article.service';
 
-@Controller('article')
+@Controller('api/article')
 @Crud({
   model: {
     type: Article,

@@ -18,6 +18,20 @@ export class AdministratorService {
     return await this.administratorRepository.find();
   }
 
+  async getByUsername(username: string): Promise<Administrator | null> {
+    const administrator = await this.administratorRepository.findOne({
+      where: {
+        username: username,
+      },
+    });
+
+    if (!administrator) {
+      return null;
+    }
+
+    return administrator;
+  }
+
   async getById(id: number): Promise<Administrator | ApiResponse> {
     const administrator = await this.administratorRepository.findOne({
       where: {
