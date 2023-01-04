@@ -48,6 +48,9 @@ export class Article {
   })
   createdAt: Date;
 
+  @Column({ type: 'integer', name: 'category_id' })
+  categoryId: number;
+
   @ManyToOne(() => Category, (category) => category.articles, {
     onDelete: 'RESTRICT',
     onUpdate: 'CASCADE',

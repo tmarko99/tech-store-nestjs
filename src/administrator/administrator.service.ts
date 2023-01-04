@@ -1,6 +1,6 @@
 import { ApiResponse } from './../shared/api-response';
 import { Administrator } from './administrator.entity';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AddAdministratorDto } from './dto/add-administrator.dto';

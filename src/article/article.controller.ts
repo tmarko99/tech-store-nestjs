@@ -1,5 +1,7 @@
+import { ApiResponse } from './../shared/api-response';
+import { AddArticleDto } from './dto/add-article.dto';
 import { Article } from './article.entity';
-import { Controller } from '@nestjs/common';
+import { Controller, Body, Post } from '@nestjs/common';
 import { Crud } from '@nestjsx/crud';
 import { ArticleService } from './article.service';
 
@@ -37,4 +39,11 @@ import { ArticleService } from './article.service';
 })
 export class ArticleController {
   constructor(public service: ArticleService) {}
+
+  @Post('/createFull')
+  createFullArticle(
+    @Body() addArticleDto: AddArticleDto,
+  ): Promise<Article | ApiResponse> {
+    return this.service.createFullArticle(addArticleDto);
+  }
 }

@@ -17,6 +17,9 @@ export class ArticlePrice {
   @Column({ type: 'numeric', precision: 10, scale: 2 })
   price: number;
 
+  @Column({ name: 'article_id', type: 'integer' })
+  articleId: number;
+
   @Column({
     type: 'timestamp with time zone',
     name: 'created_at',
