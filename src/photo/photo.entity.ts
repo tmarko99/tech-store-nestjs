@@ -23,6 +23,9 @@ export class Photo {
   })
   imagePath: string;
 
+  @Column({ type: 'integer', name: 'article_id' })
+  articleId: number;
+
   @ManyToOne(() => Article, (article) => article.photos, {
     onDelete: 'NO ACTION',
     onUpdate: 'CASCADE',

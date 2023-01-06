@@ -1,3 +1,5 @@
+import { PhotoModule } from './../photo/photo.module';
+import { forwardRef } from '@nestjs/common/utils';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
 import { ArticleService } from './article.service';
@@ -7,7 +9,10 @@ import { ArticleFeature } from './article-feature.entity';
 import { ArticlePrice } from './article-price.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Article, ArticleFeature, ArticlePrice])],
+  imports: [
+    TypeOrmModule.forFeature([Article, ArticleFeature, ArticlePrice]),
+    forwardRef(() => PhotoModule),
+  ],
   providers: [ArticleService],
   controllers: [ArticleController],
 })
