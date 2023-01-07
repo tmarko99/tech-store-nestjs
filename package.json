@@ -31,7 +31,7 @@
     "@nestjsx/crud-typeorm": "^5.0.0-alpha.3",
     "bcrypt": "^5.1.0",
     "class-transformer": "^0.5.1",
-    "file-type": "^18.0.0",
+    "file-type": "^16.5.4",
     "jsonwebtoken": "^9.0.0",
     "pg": "^8.8.0",
     "reflect-metadata": "^0.1.13",

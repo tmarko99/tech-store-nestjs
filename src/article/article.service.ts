@@ -35,7 +35,7 @@ export class ArticleService extends TypeOrmCrudService<Article> {
 
     await this.articlePriceRepository.save(articlePrice);
 
-    for (const feature of addArticleDto.features) {
+    for (const feature of features) {
       const articleFeature = new ArticleFeature();
       articleFeature.articleId = savedArticle.articleId;
       articleFeature.featureId = feature.featureId;

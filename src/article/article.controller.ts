@@ -137,7 +137,7 @@ export class ArticleController {
       return new ApiResponse('error', -4002, 'File not uploaded.');
     }
 
-    const fileTypeResult = await fileType.fileTypeFromFile(photo.path);
+    const fileTypeResult = await fileType.fromFile(photo.path);
 
     if (!fileTypeResult) {
       fs.unlinkSync(photo.path);
