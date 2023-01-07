@@ -11,6 +11,7 @@ import {
   UploadedFile,
   Inject,
   Req,
+  Delete,
 } from '@nestjs/common';
 import { Crud } from '@nestjsx/crud';
 import { ArticleService } from './article.service';
@@ -165,6 +166,45 @@ export class ArticleController {
     }
 
     return savedPhoto;
+  }
+
+  @Delete('/:articleId/deletePhoto/:photoId')
+  async deletePhoto(
+    @Param('articleId') articleId: number,
+    @Param('photoId') photoId: number,
+  ) {
+    const photo = await this.photoService.findOne({
+      where: {
+        articleId: articleId,
+        photoId: photoId,
+      },
+    });
+
+    if (!photo) {
+      return new ApiResponse('error', -4004, 'Photo not found');
+    }
+
+    try {
+      fs.unlinkSync(StorageConfig.photo.destination + photo.imagePath);
+      fs.unlinkSync(
+        StorageConfig.photo.destination +
+          StorageConfig.photo.resize.thumb.directory +
+          photo.imagePath,
+      );
+      fs.unlinkSync(
+        StorageConfig.photo.destination +
+          StorageConfig.photo.resize.small.directory +
+          photo.imagePath,
+      );
+    } catch (e) {}
+
+    const deleteResult = await this.photoService.deleteById(photoId);
+
+    if (!deleteResult.affected) {
+      return new ApiResponse('error', -4004, 'Photo not found');
+    }
+
+    return new ApiResponse('ok', 0, 'One photo deleted');
   }
 
   async createResizedImage(photo, resizeSettings) {
