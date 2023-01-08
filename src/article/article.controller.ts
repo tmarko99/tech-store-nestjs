@@ -6,6 +6,7 @@ import {
   Controller,
   Body,
   Post,
+  Patch,
   Param,
   UseInterceptors,
   UploadedFile,
@@ -22,6 +23,7 @@ import { StorageConfig } from '../shared/config/storage.config';
 import * as fileType from 'file-type';
 import * as fs from 'fs';
 import * as sharp from 'sharp';
+import { EditArticleDto } from './dto/edit-article.dto';
 
 @Controller('api/article')
 @Crud({
@@ -54,6 +56,9 @@ import * as sharp from 'sharp';
       },
     },
   },
+  routes: {
+    exclude: ['updateOneBase', 'replaceOneBase', 'deleteOneBase'],
+  },
 })
 export class ArticleController {
   constructor(
@@ -67,6 +72,14 @@ export class ArticleController {
     @Body() addArticleDto: AddArticleDto,
   ): Promise<Article | ApiResponse> {
     return this.service.createFullArticle(addArticleDto);
+  }
+
+  @Patch('/:id')
+  editFullArticle(
+    @Param('id') articleId: number,
+    @Body() editArticleDto: EditArticleDto,
+  ): Promise<Article | ApiResponse> {
+    return this.service.editFullArticle(articleId, editArticleDto);
   }
 
   @Post('/:id/uploadPhoto')
