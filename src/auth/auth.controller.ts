@@ -1,13 +1,20 @@
+import { forwardRef } from '@nestjs/common/utils';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { ApiResponse } from './../shared/api-response';
-import { Controller, Post, Body, Req } from '@nestjs/common';
+import { Controller, Post, Body, Req, Inject } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginAdministratorDto } from './dto/login-administrator.dto';
 import { Request } from 'express';
+import { UserRegistrationDto } from './dto/user-registration.dto';
+import { UserService } from '../user/user.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
+  ) {}
 
   @Post('/login')
   async doLogin(
@@ -47,5 +54,10 @@ export class AuthController {
     );
 
     return new Promise((resolve) => resolve(responseObject));
+  }
+
+  @Post('user/register')
+  async registerUser(@Body() userRegistrationDto: UserRegistrationDto) {
+    return await this.userService.registerUser(userRegistrationDto);
   }
 }
