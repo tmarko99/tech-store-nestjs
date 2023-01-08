@@ -15,6 +15,20 @@ export class UserService extends TypeOrmCrudService<User> {
     super(userRepository);
   }
 
+  async getById(id: number) {
+    return await this.userRepository.findOneBy({ userId: id });
+  }
+
+  async getByEmail(email: string): Promise<User | null> {
+    const user = await this.userRepository.findOneBy({ email: email });
+
+    if (!user) {
+      return null;
+    }
+
+    return user;
+  }
+
   async registerUser(
     userRegistrationDto: UserRegistrationDto,
   ): Promise<User | ApiResponse> {

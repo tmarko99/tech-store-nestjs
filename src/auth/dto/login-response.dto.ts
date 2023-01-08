@@ -1,12 +1,12 @@
 /* eslint-disable prettier/prettier */
 export class LoginResponseDto {
   constructor(
-    public administratorId: number,
-    public username: string,
+    public id: number,
+    public identity: string,
     public token: string,
   ) {
-    this.administratorId = administratorId;
-    this.username = username;
+    this.id = id;
+    this.identity = identity;
     this.token = token;
   }
 }

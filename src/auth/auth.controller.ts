@@ -7,6 +7,7 @@ import { LoginAdministratorDto } from './dto/login-administrator.dto';
 import { Request } from 'express';
 import { UserRegistrationDto } from './dto/user-registration.dto';
 import { UserService } from '../user/user.service';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -16,8 +17,8 @@ export class AuthController {
     private readonly userService: UserService,
   ) {}
 
-  @Post('/login')
-  async doLogin(
+  @Post('administrator/login')
+  async doAdministratorLogin(
     @Body() loginAdministratorDto: LoginAdministratorDto,
     @Req() request: Request,
   ): Promise<ApiResponse | LoginResponseDto> {
@@ -29,7 +30,7 @@ export class AuthController {
       return new Promise((resolve) => resolve(new ApiResponse('error', -3001)));
     }
 
-    const passwordValid = await this.authService.validateAdministratorPassword(
+    const passwordValid = await this.authService.validatePassword(
       loginAdministratorDto.password,
       administrator.passwordHash,
     );
@@ -43,6 +44,7 @@ export class AuthController {
 
     const token = await this.authService.generateJwt(
       administrator.username,
+      'administrator',
       ip,
       ua,
     );
@@ -56,8 +58,43 @@ export class AuthController {
     return new Promise((resolve) => resolve(responseObject));
   }
 
+  @Post('user/login')
+  async doUserLogin(
+    @Body() loginUserDto: LoginUserDto,
+    @Req() request: Request,
+  ): Promise<ApiResponse | LoginResponseDto> {
+    const user = await this.authService.findUser(loginUserDto.email);
+
+    if (!user) {
+      return new Promise((resolve) => resolve(new ApiResponse('error', -3001)));
+    }
+
+    const passwordValid = await this.authService.validatePassword(
+      loginUserDto.password,
+      user.passwordHash,
+    );
+
+    if (!passwordValid) {
+      return new Promise((resolve) => resolve(new ApiResponse('error', -3002)));
+    }
+
+    const ip = request.ip.toString();
+    const ua = request.headers['user-agent'];
+
+    const token = await this.authService.generateJwt(
+      user.email,
+      'user',
+      ip,
+      ua,
+    );
+
+    const responseObject = new LoginResponseDto(user.userId, user.email, token);
+
+    return new Promise((resolve) => resolve(responseObject));
+  }
+
   @Post('user/register')
-  async registerUser(@Body() userRegistrationDto: UserRegistrationDto) {
-    return await this.userService.registerUser(userRegistrationDto);
+  registerUser(@Body() userRegistrationDto: UserRegistrationDto) {
+    return this.userService.registerUser(userRegistrationDto);
   }
 }
