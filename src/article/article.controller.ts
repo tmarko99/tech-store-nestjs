@@ -13,6 +13,7 @@ import {
   Inject,
   Req,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { Crud } from '@nestjsx/crud';
 import { ArticleService } from './article.service';
@@ -24,6 +25,8 @@ import * as fileType from 'file-type';
 import * as fs from 'fs';
 import * as sharp from 'sharp';
 import { EditArticleDto } from './dto/edit-article.dto';
+import { RolesGuard } from 'src/shared/guards/roles.guards';
+import { Roles } from 'src/shared/decorators/roles.decorator';
 
 @Controller('api/article')
 @Crud({
@@ -68,6 +71,8 @@ export class ArticleController {
   ) {}
 
   @Post('/createFull')
+  @UseGuards(RolesGuard)
+  @Roles('administrator')
   createFullArticle(
     @Body() addArticleDto: AddArticleDto,
   ): Promise<Article | ApiResponse> {
@@ -75,6 +80,8 @@ export class ArticleController {
   }
 
   @Patch('/:id')
+  @UseGuards(RolesGuard)
+  @Roles('administrator')
   editFullArticle(
     @Param('id') articleId: number,
     @Body() editArticleDto: EditArticleDto,
@@ -83,6 +90,8 @@ export class ArticleController {
   }
 
   @Post('/:id/uploadPhoto')
+  @UseGuards(RolesGuard)
+  @Roles('administrator')
   @UseInterceptors(
     FileInterceptor('photo', {
       storage: diskStorage({
@@ -182,6 +191,8 @@ export class ArticleController {
   }
 
   @Delete('/:articleId/deletePhoto/:photoId')
+  @UseGuards(RolesGuard)
+  @Roles('administrator')
   async deletePhoto(
     @Param('articleId') articleId: number,
     @Param('photoId') photoId: number,
@@ -220,7 +231,7 @@ export class ArticleController {
     return new ApiResponse('ok', 0, 'One photo deleted');
   }
 
-  async createResizedImage(photo, resizeSettings) {
+  private async createResizedImage(photo, resizeSettings) {
     const originalFilePath = photo.path;
     const fileName = photo.fileName;
 
