@@ -25,8 +25,8 @@ import * as fileType from 'file-type';
 import * as fs from 'fs';
 import * as sharp from 'sharp';
 import { EditArticleDto } from './dto/edit-article.dto';
-import { RolesGuard } from 'src/shared/guards/roles.guards';
-import { Roles } from 'src/shared/decorators/roles.decorator';
+import { RolesGuard } from '../shared/guards/roles.guards';
+import { Roles } from '../shared/decorators/roles.decorator';
 
 @Controller('api/article')
 @Crud({
@@ -60,7 +60,13 @@ import { Roles } from 'src/shared/decorators/roles.decorator';
     },
   },
   routes: {
-    exclude: ['updateOneBase', 'replaceOneBase', 'deleteOneBase'],
+    only: ['getOneBase', 'getManyBase'],
+    getOneBase: {
+      decorators: [UseGuards(RolesGuard), Roles('administrator', 'user')],
+    },
+    getManyBase: {
+      decorators: [UseGuards(RolesGuard), Roles('administrator', 'user')],
+    },
   },
 })
 export class ArticleController {
