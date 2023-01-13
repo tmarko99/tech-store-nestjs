@@ -25,6 +25,9 @@ export class Cart {
   })
   createdAt: Date;
 
+  @Column({ type: 'integer', name: 'user_id' })
+  userId: number;
+
   @ManyToOne(() => User, (user) => user.carts, {
     onDelete: 'NO ACTION',
     onUpdate: 'CASCADE',
