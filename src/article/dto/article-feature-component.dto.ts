@@ -1,9 +1,11 @@
 /* eslint-disable prettier/prettier */
 import { IsNotEmpty, IsString, Length } from "class-validator";
 
-export class EditAdministratorDto {
+export class ArticleFeatureComponentDto {
+  featureId: number;
+  
   @IsNotEmpty()
   @IsString()
-  @Length(6, 128)
-  password: string;
+  @Length(1, 255)
+  value: string;
 }

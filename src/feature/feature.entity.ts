@@ -12,6 +12,7 @@ import {
 import { ArticleFeature } from '../article/article-feature.entity';
 import { Category } from '../category/category.entity';
 import { Article } from '../article/article.entity';
+import { IsNotEmpty, IsString, Length } from 'class-validator';
 
 @Index('uq_feature_name_category_id', ['categoryId', 'name'], { unique: true })
 @Index('feature_pkey', ['featureId'], { unique: true })
@@ -21,6 +22,9 @@ export class Feature {
   featureId: number;
 
   @Column({ name: 'name', type: 'character varying', unique: true, length: 32 })
+  @IsNotEmpty()
+  @IsString()
+  @Length(5, 32)
   name: string;
 
   @Column({ name: 'category_id', type: 'integer', unique: true })

@@ -1,3 +1,4 @@
+import { IsNotEmpty, IsNumber, IsPositive } from 'class-validator';
 import {
   Column,
   Entity,
@@ -15,6 +16,9 @@ export class ArticlePrice {
   articlePriceId: number;
 
   @Column({ type: 'numeric', precision: 10, scale: 2 })
+  @IsNotEmpty()
+  @IsNumber({ allowInfinity: false, allowNaN: false, maxDecimalPlaces: 2 })
+  @IsPositive()
   price: number;
 
   @Column({ name: 'article_id', type: 'integer' })

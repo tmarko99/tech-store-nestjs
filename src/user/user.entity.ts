@@ -1,4 +1,12 @@
 import {
+  IsEmail,
+  IsHash,
+  IsNotEmpty,
+  IsPhoneNumber,
+  IsString,
+  Length,
+} from 'class-validator';
+import {
   Column,
   Entity,
   Index,
@@ -20,15 +28,30 @@ export class User {
     unique: true,
     length: 255,
   })
+  @IsNotEmpty()
+  @IsEmail({
+    allow_ip_domain: false,
+    allow_utf8_local_part: true,
+    require_tld: true,
+  })
   email: string;
 
   @Column({ name: 'password_hash', type: 'character varying', length: 128 })
+  @IsNotEmpty()
+  @IsString()
+  @IsHash('sha256')
   passwordHash: string;
 
   @Column({ type: 'character varying', length: 64 })
+  @IsNotEmpty()
+  @IsString()
+  @Length(2, 64)
   forename: string;
 
   @Column({ type: 'character varying', length: 64 })
+  @IsNotEmpty()
+  @IsString()
+  @Length(2, 64)
   surname: string;
 
   @Column({
@@ -37,9 +60,15 @@ export class User {
     unique: true,
     length: 24,
   })
+  @IsNotEmpty()
+  @IsPhoneNumber(null)
+  @Length(2, 64)
   phoneNumber: string;
 
   @Column({ name: 'postal_address', type: 'text' })
+  @IsNotEmpty()
+  @IsString()
+  @Length(10, 512)
   postalAddress: string;
 
   @OneToMany(() => Cart, (cart) => cart.user)

@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Cart } from './cart.entity';
 import { Article } from '../article/article.entity';
+import { IsNotEmpty, IsNumber, IsPositive } from 'class-validator';
 
 @Index('uq_cart_article_cart_id_article_id', ['articleId', 'cartId'], {
   unique: true,
@@ -25,6 +26,9 @@ export class CartArticle {
   articleId: number;
 
   @Column({ type: 'integer' })
+  @IsNotEmpty()
+  @IsNumber({ allowInfinity: false, allowNaN: false, maxDecimalPlaces: 0 })
+  @IsPositive()
   quantity: number;
 
   @ManyToOne(() => Article, (article) => article.cartArticles, {

@@ -1,3 +1,4 @@
+import { IsIn, IsNotEmpty, IsString } from 'class-validator';
 import {
   Column,
   Entity,
@@ -30,6 +31,9 @@ export class Order {
     enum: ['rejected', 'accepted', 'shipped', 'pending'],
     default: () => "'pending'",
   })
+  @IsNotEmpty()
+  @IsString()
+  @IsIn(['rejected', 'accepted', 'shipped', 'pending'])
   status: 'rejected' | 'accepted' | 'shipped' | 'pending';
 
   @OneToOne(() => Cart, (cart) => cart.order, {

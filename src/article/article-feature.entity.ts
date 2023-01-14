@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Article } from './article.entity';
 import { Feature } from '../feature/feature.entity';
+import { IsNotEmpty, IsString, Length } from 'class-validator';
 
 @Index('article_feature_pkey', ['articleFeatureId'], { unique: true })
 @Index('uq_article_feature_article_id_feature_id', ['articleId', 'featureId'], {
@@ -25,6 +26,9 @@ export class ArticleFeature {
   featureId: number;
 
   @Column({ type: 'character varying', length: 255 })
+  @IsNotEmpty()
+  @IsString()
+  @Length(1, 255)
   value: string;
 
   @ManyToOne(() => Article, (article) => article.articleFeatures, {

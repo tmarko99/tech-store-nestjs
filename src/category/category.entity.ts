@@ -1,3 +1,4 @@
+import { IsNotEmpty, IsString, Length } from 'class-validator';
 import {
   Column,
   Entity,
@@ -19,6 +20,9 @@ export class Category {
   categoryId: number;
 
   @Column({ name: 'name', type: 'character varying', unique: true, length: 32 })
+  @IsNotEmpty()
+  @IsString()
+  @Length(5, 32)
   name: string;
 
   @Column({
@@ -27,6 +31,9 @@ export class Category {
     unique: true,
     length: 128,
   })
+  @IsNotEmpty()
+  @IsString()
+  @Length(1, 128)
   imagePath: string;
 
   @OneToMany(() => Article, (article) => article.category)

@@ -15,6 +15,7 @@ import { CartArticle } from '../cart/cart-article.entity';
 import { Category } from '../category/category.entity';
 import { Photo } from '../photo/photo.entity';
 import { Feature } from './../feature/feature.entity';
+import { IsIn, IsNotEmpty, IsString, Length } from 'class-validator';
 
 @Index('article_pkey', ['articleId'], { unique: true })
 @Entity()
@@ -23,15 +24,26 @@ export class Article {
   articleId: number;
 
   @Column({ type: 'character varying', length: 128 })
+  @IsNotEmpty()
+  @IsString()
+  @Length(5, 128)
   name: string;
 
   @Column({ type: 'character varying', length: 255 })
+  @IsNotEmpty()
+  @IsString()
+  @Length(10, 255)
   excerpt: string;
 
   @Column({ type: 'text' })
+  @IsNotEmpty()
+  @IsString()
+  @Length(64, 10000)
   description: string;
 
   @Column({ name: 'is_promoted', type: 'smallint', default: () => '0' })
+  @IsNotEmpty()
+  @IsIn([0, 1])
   isPromoted: number;
 
   @Column({
@@ -39,6 +51,9 @@ export class Article {
     enum: ['available', 'visible', 'hidden'],
     default: () => "'available'",
   })
+  @IsNotEmpty()
+  @IsString()
+  @IsIn(['available', 'visible', 'hidden'])
   status: 'available' | 'visible' | 'hidden';
 
   @Column({
