@@ -27,6 +27,7 @@ import * as sharp from 'sharp';
 import { EditArticleDto } from './dto/edit-article.dto';
 import { RolesGuard } from '../shared/guards/roles.guards';
 import { Roles } from '../shared/decorators/roles.decorator';
+import { ArticleSearchDto } from './dto/article-search.dto';
 
 @Controller('api/article')
 @Crud({
@@ -75,6 +76,13 @@ export class ArticleController {
     @Inject(PhotoService)
     private readonly photoService: PhotoService,
   ) {}
+
+  @Post('/search')
+  @UseGuards(RolesGuard)
+  @Roles('administrator', 'user')
+  search(@Body() articleSearchDto: ArticleSearchDto): Promise<Article[]> {
+    return this.service.search(articleSearchDto);
+  }
 
   @Post('/createFull')
   @UseGuards(RolesGuard)

@@ -3,11 +3,12 @@ import { AddArticleDto } from './dto/add-article.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Article } from './article.entity';
 import { ArticlePrice } from './article-price.entity';
 import { ArticleFeature } from './article-feature.entity';
 import { EditArticleDto } from './dto/edit-article.dto';
+import { ArticleSearchDto } from './dto/article-search.dto';
 
 @Injectable()
 export class ArticleService extends TypeOrmCrudService<Article> {
@@ -129,5 +130,99 @@ export class ArticleService extends TypeOrmCrudService<Article> {
         relations: ['category', 'features', 'articleFeatures', 'articlePrices'],
       });
     }
+  }
+
+  async search(articleSearchDto: ArticleSearchDto): Promise<Article[]> {
+    const article = await this.articleRepository.createQueryBuilder('article');
+    article.innerJoinAndSelect(
+      'article.articlePrices',
+      'articlePrices',
+      'articlePrices.createdAt = (SELECT MAX(ap.created_at) FROM article_price AS ap WHERE ap.article_id = article.article_id)',
+    );
+    article.leftJoin('article.articleFeatures', 'articleFeatures');
+
+    article.where('article.categoryId = :categoryId', {
+      categoryId: articleSearchDto.categoryId,
+    });
+
+    if (articleSearchDto.keywords) {
+      article.andWhere(
+        '(article.name LIKE :keyword OR article.excerpt LIKE :keyword OR article.description LIKE :keyword)',
+        { keyword: '%' + articleSearchDto.keywords.trim() + '%' },
+      );
+    }
+
+    if (articleSearchDto.priceMin) {
+      article.andWhere('articlePrices.price >= :min', {
+        min: articleSearchDto.priceMin,
+      });
+    }
+
+    if (articleSearchDto.priceMax) {
+      article.andWhere('articlePrices.price <= :max', {
+        max: articleSearchDto.priceMax,
+      });
+    }
+
+    if (articleSearchDto.features && articleSearchDto.features.length > 0) {
+      for (const feature of articleSearchDto.features) {
+        article.andWhere(
+          'articleFeatures.featureId = :featureId AND articleFeatures.value IN (:featureValues)',
+          { featureId: feature.featureId, featureValues: feature.values },
+        );
+      }
+    }
+
+    let orderBy = 'article.name';
+    let orderDirection: 'ASC' | 'DESC' = 'ASC';
+
+    if (articleSearchDto.orderBy) {
+      orderBy = articleSearchDto.orderBy;
+
+      if (orderBy === 'price') {
+        orderBy = 'articleFeatures.price';
+      }
+
+      if (orderBy === 'name') {
+        orderBy = 'article.name';
+      }
+    }
+
+    if (articleSearchDto.orderDirection) {
+      orderDirection = articleSearchDto.orderDirection;
+    }
+
+    article.orderBy(orderBy, orderDirection);
+
+    let page = 0;
+    let itemsPerPage: 5 | 10 | 25 | 50 | 75 = 25;
+
+    if (articleSearchDto.page) {
+      page = articleSearchDto.page;
+    }
+
+    if (articleSearchDto.itemsPerPage) {
+      itemsPerPage = articleSearchDto.itemsPerPage;
+    }
+
+    article.skip(page * itemsPerPage);
+    article.take(itemsPerPage);
+
+    const articleIds = await (
+      await article.getMany()
+    ).map((article) => article.articleId);
+
+    return await this.articleRepository.find({
+      where: {
+        articleId: In(articleIds),
+      },
+      relations: [
+        'category',
+        'features',
+        'articleFeatures',
+        'articlePrices',
+        'photos',
+      ],
+    });
   }
 }

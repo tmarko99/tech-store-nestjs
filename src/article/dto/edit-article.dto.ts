@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { IsArray, IsIn, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, Length, ValidateNested } from "class-validator";
-import { ArticleFeatureComponentDto } from "./article-feature-component.dto";
+import { ArticleFeatureComponentDto } from "./article-feature.component.dto";
 
 export class EditArticleDto {
   @IsNotEmpty()
