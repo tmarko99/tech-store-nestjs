@@ -14,6 +14,7 @@ import { PhotoModule } from './photo/photo.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthMiddleware } from './shared/middlewares/auth.middleware';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
@@ -28,6 +29,19 @@ import { AuthMiddleware } from './shared/middlewares/auth.middleware';
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
         autoLoadEntities: true,
+      }),
+      inject: [ConfigService],
+    }),
+    MailerModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        transport: `smtps://${configService.get(
+          'MAIL_USERNAME',
+        )}:${configService.get('MAIL_PASSWORD')}@${configService.get(
+          'HOSTNAME',
+        )}`,
+        defaults: {
+          from: configService.get('SENDER_EMAIL'),
+        },
       }),
       inject: [ConfigService],
     }),

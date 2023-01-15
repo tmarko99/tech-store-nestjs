@@ -134,11 +134,13 @@ export class ArticleService extends TypeOrmCrudService<Article> {
 
   async search(articleSearchDto: ArticleSearchDto): Promise<Article[]> {
     const article = await this.articleRepository.createQueryBuilder('article');
+
     article.innerJoinAndSelect(
       'article.articlePrices',
       'articlePrices',
       'articlePrices.createdAt = (SELECT MAX(ap.created_at) FROM article_price AS ap WHERE ap.article_id = article.article_id)',
     );
+
     article.leftJoin('article.articleFeatures', 'articleFeatures');
 
     article.where('article.categoryId = :categoryId', {

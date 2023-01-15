@@ -18,6 +18,7 @@ import { EditArticleInCartDto } from './dto/edit-article-in-cart.dto';
 import { OrderService } from '../order/order.service';
 import { Order } from '../order/order.entity';
 import { ApiResponse } from '../shared/api-response';
+import { OrderMailerService } from '../order/order-mailer.service';
 
 @Controller('api/cart')
 export class CartController {
@@ -25,6 +26,8 @@ export class CartController {
     private readonly cartService: CartService,
     @Inject(forwardRef(() => OrderService))
     private readonly orderService: OrderService,
+    @Inject(forwardRef(() => OrderMailerService))
+    private readonly orderMailerService: OrderMailerService,
   ) {}
 
   @Get()
@@ -72,7 +75,15 @@ export class CartController {
   async makeOrder(@CurrentUser() currentUser): Promise<Order | ApiResponse> {
     const cart = await this.getActiveCartForUser(currentUser.id);
 
-    return this.orderService.createOrder(cart.cartId);
+    const order = await this.orderService.createOrder(cart.cartId);
+
+    if (order instanceof ApiResponse) {
+      return order;
+    }
+
+    await this.orderMailerService.sendOrderEmail(order);
+
+    return order;
   }
 
   private async getActiveCartForUser(userId: number): Promise<Cart> {
