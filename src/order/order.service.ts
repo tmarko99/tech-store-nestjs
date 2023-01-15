@@ -4,16 +4,18 @@ import { Cart } from '../cart/cart.entity';
 import { Repository } from 'typeorm';
 import { Order } from './order.entity';
 import { ApiResponse } from '../shared/api-response';
+import { ChangeOrderStatusDto } from './dto/change-order-status.dto';
 
 @Injectable()
 export class OrderService {
   constructor(
-    @InjectRepository(Order) private readonly orderService: Repository<Order>,
+    @InjectRepository(Order)
+    private readonly orderRepository: Repository<Order>,
     @InjectRepository(Cart) private readonly cartRepository: Repository<Cart>,
   ) {}
 
   async createOrder(cartId: number): Promise<Order | ApiResponse> {
-    const order = await this.orderService.findOne({
+    const order = await this.orderRepository.findOne({
       where: {
         cartId: cartId,
       },
@@ -45,11 +47,15 @@ export class OrderService {
     const newOrder = new Order();
     newOrder.cartId = cartId;
 
-    const savedOrder = await this.orderService.save(newOrder);
+    const savedOrder = await this.orderRepository.save(newOrder);
 
-    return await this.orderService.findOne({
+    return await this.getById(savedOrder.orderId);
+  }
+
+  async getById(orderId: number): Promise<Order | ApiResponse> {
+    const order = await this.orderRepository.findOne({
       where: {
-        orderId: savedOrder.orderId,
+        orderId: orderId,
       },
       relations: [
         'cart',
@@ -60,5 +66,26 @@ export class OrderService {
         'cart.cartArticles.article.articlePrices',
       ],
     });
+
+    if (!order) {
+      return new ApiResponse('error', -9001, 'No such order found.');
+    }
+
+    return order;
+  }
+
+  async changeStatus(
+    orderId: number,
+    changeOrderStatusDto: ChangeOrderStatusDto,
+  ): Promise<Order | ApiResponse> {
+    const order = await this.getById(orderId);
+
+    order.status = changeOrderStatusDto.newStatus;
+
+    if (order instanceof Order) {
+      await this.orderRepository.save(order);
+    }
+
+    return this.getById(orderId);
   }
 }
