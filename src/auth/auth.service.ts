@@ -42,10 +42,9 @@ export class AuthService {
   ) {
     let userOrAdministrator;
     let jwtData;
-    const currentTime = new Date();
-    currentTime.setDate(currentTime.getDate() + 14);
 
-    const expDate = currentTime.getTime() / 1000;
+    const expDate = this.getDatePlus(60 * 5);
+
     if (role === 'administrator') {
       userOrAdministrator = await this.findAdministrator(identity);
       jwtData = new JwtDataDto(
@@ -72,5 +71,59 @@ export class AuthService {
       JSON.parse(JSON.stringify(jwtData)),
       this.configService.get('JWT_SECRET'),
     );
+  }
+
+  async generateJwtRefreshToken(
+    identity: string,
+    role: 'administrator' | 'user',
+    ip: string,
+    ua: string,
+  ) {
+    let userOrAdministrator;
+    let jwtData;
+
+    const expDate = this.getDatePlus(60 * 50 * 24 * 31);
+
+    if (role === 'administrator') {
+      userOrAdministrator = await this.findAdministrator(identity);
+      jwtData = new JwtDataDto(
+        userOrAdministrator.administratorId,
+        userOrAdministrator.username,
+        role,
+        expDate,
+        ip,
+        ua,
+      );
+    } else if (role === 'user') {
+      userOrAdministrator = await this.findUser(identity);
+      jwtData = new JwtDataDto(
+        userOrAdministrator.userId,
+        userOrAdministrator.email,
+        role,
+        expDate,
+        ip,
+        ua,
+      );
+    }
+
+    return jwt.sign(
+      JSON.parse(JSON.stringify(jwtData)),
+      this.configService.get('JWT_SECRET'),
+    );
+  }
+
+  getDatePlus(numberOfSeconds: number) {
+    return new Date().getTime() / 1000 + numberOfSeconds;
+  }
+
+  getIsoDate(timestamp: number): string {
+    const date = new Date();
+    date.setTime(timestamp * 1000);
+
+    return date.toISOString();
+  }
+
+  getDatabaseDateFormat(isoFormat: string): string {
+    return isoFormat.substring(0, 19).replace('T', ' ');
   }
 }
