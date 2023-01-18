@@ -45,7 +45,7 @@ export class Feature {
   articles: Article[];
 
   @ManyToOne(() => Category, (category) => category.features, {
-    onDelete: 'RESTRICT',
+    onDelete: 'NO ACTION',
     onUpdate: 'CASCADE',
   })
   @JoinColumn([{ name: 'category_id', referencedColumnName: 'categoryId' }])

@@ -32,14 +32,14 @@ export class CartArticle {
   quantity: number;
 
   @ManyToOne(() => Article, (article) => article.cartArticles, {
-    onDelete: 'RESTRICT',
+    onDelete: 'NO ACTION',
     onUpdate: 'CASCADE',
   })
   @JoinColumn([{ name: 'article_id', referencedColumnName: 'articleId' }])
   article: Article;
 
   @ManyToOne(() => Cart, (cart) => cart.cartArticles, {
-    onDelete: 'RESTRICT',
+    onDelete: 'NO ACTION',
     onUpdate: 'CASCADE',
   })
   @JoinColumn([{ name: 'cart_id', referencedColumnName: 'cartId' }])

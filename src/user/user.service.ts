@@ -36,7 +36,10 @@ export class UserService extends TypeOrmCrudService<User> {
     userRegistrationDto: UserRegistrationDto,
   ): Promise<User | ApiResponse> {
     const user = this.userRepository.create(userRegistrationDto);
-    user.passwordHash = await bcrypt.hash(userRegistrationDto.password, 10);
+
+    const salt = await bcrypt.genSalt();
+
+    user.passwordHash = await bcrypt.hash(userRegistrationDto.password, salt);
 
     try {
       const savedUser = await this.userRepository.save(user);

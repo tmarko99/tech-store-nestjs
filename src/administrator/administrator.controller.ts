@@ -17,23 +17,21 @@ import { Roles } from '../shared/decorators/roles.decorator';
 
 @Controller('api/administrator')
 @UseGuards(RolesGuard)
+@Roles('administrator')
 export class AdministratorController {
   constructor(private readonly administratorService: AdministratorService) {}
 
   @Get()
-  @Roles('administrator')
   getAll(): Promise<Administrator[]> {
     return this.administratorService.getAll();
   }
 
   @Get('/:id')
-  @Roles('administrator')
   getById(@Param('id') id: number): Promise<Administrator | ApiResponse> {
     return this.administratorService.getById(id);
   }
 
   @Post()
-  @Roles('administrator')
   addAdministrator(
     @Body() addAdministratorDto: AddAdministratorDto,
   ): Promise<Administrator | ApiResponse> {
@@ -41,7 +39,6 @@ export class AdministratorController {
   }
 
   @Put('/:id')
-  @Roles('administrator')
   editAdministrator(
     @Param('id') id: number,
     @Body() editAdministratorDto: EditAdministratorDto,

@@ -56,9 +56,11 @@ export class AdministratorService {
     const administrator =
       this.administratorRepository.create(addAdministratorDto);
 
+    const salt = await bcrypt.genSalt();
+
     administrator.passwordHash = await bcrypt.hash(
       addAdministratorDto.password,
-      10,
+      salt,
     );
 
     return new Promise((resolve) => {

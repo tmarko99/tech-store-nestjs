@@ -40,7 +40,7 @@ export class Category {
   articles: Article[];
 
   @ManyToOne(() => Category, (category) => category.categories, {
-    onDelete: 'RESTRICT',
+    onDelete: 'NO ACTION',
     onUpdate: 'CASCADE',
   })
   @JoinColumn([
